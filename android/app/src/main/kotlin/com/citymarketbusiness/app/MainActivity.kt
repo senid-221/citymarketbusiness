@@ -1,4 +1,4 @@
-package com.garizo.app
+package com.citymarketbusiness.app
 
 import io.flutter.embedding.android.FlutterActivity
 

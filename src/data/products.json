@@ -1,0 +1,352 @@
+[
+  {
+    "name": "Organic lemon",
+    "quantity": "4 Pic",
+    "price": "$1.22",
+    "category": "Fruits",
+    "featured": true
+  },
+  {
+    "name": "Mango",
+    "quantity": "1 kg",
+    "price": "$5.99",
+    "category": "Fruits",
+    "featured": true
+  },
+  {
+    "name": "Fresh raw beef",
+    "quantity": "2 Kg",
+    "price": "$19.02",
+    "category": "Meats",
+    "featured": true
+  },
+  {
+    "name": "Fresh banana",
+    "quantity": "8 pic",
+    "price": "$2.99",
+    "category": "Fruits",
+    "featured": true
+  },
+  {
+    "name": "Organic lemone fruits",
+    "quantity": "4 Pic",
+    "price": "$1.22",
+    "category": "Fruits",
+    "featured": true
+  },
+  {
+    "name": "Fresh apple",
+    "quantity": "1 kg",
+    "price": "$4.99",
+    "category": "Fruits",
+    "featured": true
+  },
+  {
+    "name": "Avocado",
+    "quantity": "1 kg",
+    "price": "$14.00",
+    "category": "Fruits",
+    "featured": true
+  },
+  {
+    "name": "Raw seabass fish",
+    "quantity": "1 Pic",
+    "price": "$14.00",
+    "category": "Seafood",
+    "featured": true
+  },
+  {
+    "name": "Pineapple",
+    "quantity": "8 pic",
+    "price": "$3.00",
+    "category": "Fruits",
+    "featured": true
+  },
+  {
+    "name": "Fresh orange juice",
+    "quantity": "1 L",
+    "price": "$10.06",
+    "category": "Beverages",
+    "featured": true
+  },
+  {
+    "name": "Cucumber",
+    "quantity": "200 gm",
+    "price": "$2.49",
+    "category": "Veggies",
+    "featured": false
+  },
+  {
+    "name": "Strawberries",
+    "quantity": "250 gm",
+    "price": "$2.29",
+    "category": "Fruits",
+    "featured": false
+  },
+  {
+    "name": "Ground Beef",
+    "quantity": "500 gm",
+    "price": "$5.19",
+    "category": "Meats",
+    "featured": false
+  },
+  {
+    "name": "Avocado",
+    "quantity": "2 pcs",
+    "price": "$3.19",
+    "category": "Fruits",
+    "featured": false
+  },
+  {
+    "name": "Red Apples",
+    "quantity": "500 gm",
+    "price": "$2.50",
+    "category": "Fruits",
+    "featured": false
+  },
+  {
+    "name": "Sweet Corn",
+    "quantity": "200 gm",
+    "price": "$2.49",
+    "category": "Veggies",
+    "featured": false
+  },
+  {
+    "name": "Dragon Fruit",
+    "quantity": "1 pc",
+    "price": "$2.99",
+    "category": "Fruits",
+    "featured": false
+  },
+  {
+    "name": "Garlic Baguette",
+    "quantity": "1 pcs",
+    "price": "$3.29",
+    "category": "Bakery",
+    "featured": false
+  },
+  {
+    "name": "Blueberries",
+    "quantity": "250 gm",
+    "price": "$3.59",
+    "category": "Fruits",
+    "featured": false
+  },
+  {
+    "name": "Chicken Wings",
+    "quantity": "500 gm",
+    "price": "$4.29",
+    "category": "Meats",
+    "featured": false
+  },
+  {
+    "name": "Leeks",
+    "quantity": "300 gm",
+    "price": "$1.89",
+    "category": "Veggies",
+    "featured": false
+  },
+  {
+    "name": "Pumpkin Slice",
+    "quantity": "300 gm",
+    "price": "$3.59",
+    "category": "Veggies",
+    "featured": false
+  },
+  {
+    "name": "Kiwi",
+    "quantity": "3 pcs",
+    "price": "$2.79",
+    "category": "Fruits",
+    "featured": false
+  },
+  {
+    "name": "Whipping Cream",
+    "quantity": "300 gm",
+    "price": "$2.99",
+    "category": "Dairy & Eggs",
+    "featured": false
+  },
+  {
+    "name": "Eggplant",
+    "quantity": "500 gm",
+    "price": "$2.09",
+    "category": "Veggies",
+    "featured": false
+  },
+  {
+    "name": "Beef Sirloin",
+    "quantity": "300 gm",
+    "price": "$6.49",
+    "category": "Meats",
+    "featured": false
+  },
+  {
+    "name": "Wheat Bread",
+    "quantity": "1 loaf",
+    "price": "$2.99",
+    "category": "Bakery",
+    "featured": false
+  },
+  {
+    "name": "Mango",
+    "quantity": "1 pcs",
+    "price": "$2.19",
+    "category": "Fruits",
+    "featured": false
+  },
+  {
+    "name": "Bok Choy",
+    "quantity": "250 gm",
+    "price": "$3.20",
+    "category": "Veggies",
+    "featured": false
+  },
+  {
+    "name": "Pineapple",
+    "quantity": "1 pcs",
+    "price": "$3.29",
+    "category": "Fruits",
+    "featured": false
+  },
+  {
+    "name": "Croissant",
+    "quantity": "2 pcs",
+    "price": "$3.49",
+    "category": "Bakery",
+    "featured": false
+  },
+  {
+    "name": "Mozzarella Cheese",
+    "quantity": "250 gm",
+    "price": "$3.49",
+    "category": "Dairy & Eggs",
+    "featured": false
+  },
+  {
+    "name": "Oranges",
+    "quantity": "1 kg",
+    "price": "$3.29",
+    "category": "Fruits",
+    "featured": false
+  },
+  {
+    "name": "Greek Yogurt",
+    "quantity": "200 gm",
+    "price": "$2.29",
+    "category": "Dairy & Eggs",
+    "featured": false
+  },
+  {
+    "name": "Smoked Sausage",
+    "quantity": "300 gm",
+    "price": "$3.99",
+    "category": "Meats",
+    "featured": false
+  },
+  {
+    "name": "Cinnamon Roll",
+    "quantity": "2 pcs",
+    "price": "$3.19",
+    "category": "Bakery",
+    "featured": false
+  },
+  {
+    "name": "Cottage Cheese",
+    "quantity": "200 gm",
+    "price": "$2.59",
+    "category": "Dairy & Eggs",
+    "featured": false
+  },
+  {
+    "name": "Green Grapes",
+    "quantity": "500 gm",
+    "price": "$3.49",
+    "category": "Fruits",
+    "featured": false
+  },
+  {
+    "name": "Chicken Breast",
+    "quantity": "500 gm",
+    "price": "$4.89",
+    "category": "Meats",
+    "featured": false
+  },
+  {
+    "name": "Red Bell Pepper",
+    "quantity": "250 gm",
+    "price": "$2.55",
+    "category": "Veggies",
+    "featured": false
+  },
+  {
+    "name": "Salted Butter",
+    "quantity": "250 gm",
+    "price": "$2.69",
+    "category": "Dairy & Eggs",
+    "featured": false
+  },
+  {
+    "name": "Papaya",
+    "quantity": "1 pcs",
+    "price": "$2.79",
+    "category": "Fruits",
+    "featured": false
+  },
+  {
+    "name": "Chocolate Milk",
+    "quantity": "250 gm",
+    "price": "$1.89",
+    "category": "Dairy & Eggs",
+    "featured": false
+  },
+  {
+    "name": "Chocolate Muffin",
+    "quantity": "2 pcs",
+    "price": "$2.59",
+    "category": "Bakery",
+    "featured": false
+  },
+  {
+    "name": "Watermelon Slice",
+    "quantity": "400 gm",
+    "price": "$2.40",
+    "category": "Fruits",
+    "featured": false
+  },
+  {
+    "name": "Lamb Chops",
+    "quantity": "400 gm",
+    "price": "$6.79",
+    "category": "Meats",
+    "featured": false
+  },
+  {
+    "name": "Banana Bread",
+    "quantity": "1 slices",
+    "price": "$2.49",
+    "category": "Bakery",
+    "featured": false
+  },
+  {
+    "name": "Kale Leaves",
+    "quantity": "250 gm",
+    "price": "$1.99",
+    "category": "Veggies",
+    "featured": false
+  },
+  {
+    "name": "Bananas",
+    "quantity": "1 Dozen",
+    "price": "$2.99",
+    "category": "Fruits",
+    "featured": false
+  },
+  {
+    "name": "Grapes",
+    "quantity": "500 gm",
+    "price": "$3.39",
+    "category": "Fruits",
+    "featured": false
+  }
+]

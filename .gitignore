@@ -30,6 +30,11 @@
 .pub-cache/
 .pub/
 /build/
+/out/
+/.next/
+/node_modules/
+/tsconfig.tsbuildinfo
+/npm-debug.log*
 
 # Firebase – this is necessary if you use Firebase since it could otherwise 
 # lead to leaking of private certificates to your repository, which is no bueno.
