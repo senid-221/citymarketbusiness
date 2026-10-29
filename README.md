@@ -4,7 +4,7 @@ CityMarket Business is a Flutter app configured for web deployment with Firebase
 
 ## Build and deploy the web app
 
-Install Flutter 3.27 or newer and Firebase CLI, then authenticate with accounts that
+Install Flutter 3.47.8 or newer and Firebase CLI, then authenticate with accounts that
 have access to the Firebase project. The npm build script is provided for hosting
 platforms that expect a `package.json`; it delegates to Flutter and does not install
 or provide the Flutter SDK:
@@ -32,9 +32,9 @@ Hostinger, then add these repository secrets under **Settings → Secrets and va
 
 The workflow builds on every push to `main`. If deployment secrets are not yet
 configured, it still builds the site and skips deployment with a warning. After
-adding the secrets, run the workflow manually from the Actions tab to deploy without
-needing another code change. The workflow does not delete other files in the target
-directory.
+adding the secrets, run the workflow manually from the Actions tab on `main` to deploy
+without needing another code change. The workflow does not delete other files in the
+target directory.
 
 ## Configure Firebase Authentication
 
