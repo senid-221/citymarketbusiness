@@ -238,6 +238,30 @@ img { max-width: 100%; }
 .notification-item p { margin: 3px 0 0; color: var(--muted); font-size: 12px; }
 .mobile-bottom-nav { display: none; }
 .loading-state { padding: 80px 20px; color: var(--muted); text-align: center; }
+.planner-layout { display: grid; grid-template-columns: minmax(280px, .75fr) minmax(0, 1.25fr); gap: 20px; align-items: start; }
+.planner-form, .planner-sign-in, .planner-results { padding: 22px; border: 1px solid var(--line); border-radius: 6px; background: white; }
+.planner-form h2, .planner-sign-in h2, .planner-empty h2, .planner-plan h2 { margin: 0 0 12px; font-family: var(--serif); font-size: 24px; font-weight: 500; }
+.planner-form .button { width: 100%; margin-top: 15px; }
+.planner-form .button:disabled { opacity: .65; cursor: wait; }
+.planner-form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.planner-limit, .planner-disclaimer { color: var(--muted); font-size: 11px; line-height: 1.7; }
+.planner-sign-in p, .planner-empty p, .planner-summary { color: var(--muted); font-size: 13px; line-height: 1.8; }
+.planner-sign-in .button { margin-top: 12px; }
+.planner-empty { padding: 65px 15px; text-align: center; }
+.planner-empty > span { display: block; margin-bottom: 12px; font-size: 38px; }
+.planner-meals { display: grid; gap: 10px; margin: 20px 0; }
+.planner-meal { padding: 15px; border: 1px solid var(--line); border-radius: 5px; background: #fcfcfa; }
+.planner-meal h3, .planner-shopping h3 { margin: 4px 0 8px; font-family: var(--serif); font-size: 19px; font-weight: 500; }
+.planner-meal p, .planner-meal li { font-size: 12px; line-height: 1.7; }
+.planner-meal p { color: var(--muted); }
+.planner-meal ol { padding-left: 20px; margin-bottom: 0; }
+.planner-shopping { padding: 17px; border-radius: 5px; background: #f5f7f0; }
+.planner-shopping-line, .planner-total { display: flex; justify-content: space-between; gap: 12px; padding: 9px 0; border-top: 1px solid var(--line); font-size: 12px; }
+.planner-shopping-line small { display: block; color: var(--muted); }
+.planner-total { margin: 5px 0 12px; border-top: 1px solid #d5dacd; font-size: 13px; }
+.planner-shopping .button { width: 100%; }
+.planner-disclaimer { margin: 14px 0 0; }
+.planner-shopping .form-success a { color: var(--brand); font-weight: 700; }
 
 @media (max-width: 950px) {
   .header-main { gap: 16px; }.location-button { min-width: unset; }.location-copy { display: none; }.location-button > span:last-child { display: none; }
@@ -277,7 +301,8 @@ img { max-width: 100%; }
   .profile-grid { grid-template-columns: 1fr; }.profile-menu { grid-template-columns: 1fr 1fr; gap: 2px; padding: 10px; }
   .auth-wrap { grid-template-columns: 1fr; }.auth-aside { padding: 23px; }.auth-aside h2 { font-size: 27px; }.auth-form { padding: 24px; }
   .help-grid { grid-template-columns: 1fr; }
-  .mobile-bottom-nav { position: relative; z-index: 1; display: grid; grid-template-columns: repeat(4, 1fr); min-height: 66px; margin: -20px 16px 0; border: 1px solid var(--line); border-radius: 5px; background: #fff; box-shadow: 0 5px 16px #20241f09; }
+  .planner-layout { grid-template-columns: 1fr; gap: 13px; }.planner-form, .planner-sign-in, .planner-results { padding: 16px; }
+  .mobile-bottom-nav { position: relative; z-index: 1; display: grid; grid-template-columns: repeat(5, 1fr); min-height: 66px; margin: -20px 16px 0; border: 1px solid var(--line); border-radius: 5px; background: #fff; box-shadow: 0 5px 16px #20241f09; }
   .mobile-bottom-nav a { display: grid; place-content: center; justify-items: center; gap: 1px; min-height: 64px; color: #6b7068; font-size: 12px; }.mobile-bottom-nav a span { font-size: 19px; }.mobile-bottom-nav a:hover { color: var(--brand); }
   .page-intro p, .text-link, .result-count, .filter-pill, .product-details .product-quantity, .detail-description, .quantity-detail, .notice, .summary-row, .order-summary-line, .summary-note, .empty-state p, .form-field label, .form-field input, .form-field select, .form-field textarea, .form-card > p, .profile-row, .profile-menu a, .profile-menu button, .profile-content .notice, .auth-form > p, .auth-bottom, .help-card p, .notification-item, .notification-item p, .footer-grid > div, .footer-grid > div > p, .footer-grid > div > span, .footer-bottom { font-size: 12px; }
   .search-form input { font-size: 12px; }.search-form button { min-width: 70px; height: 35px; font-size: 12px; }

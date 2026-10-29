@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { catalog, categories } from "@/data/store";
+import { catalog, categories, getProductKey } from "@/data/store";
 import { ProductCard, SectionHeading } from "@/components/store-ui";
 
 export function CategoryCatalog() {
@@ -30,7 +30,7 @@ export function CategoryCatalog() {
       <div className="filter-list" aria-label="Filter by category"><button className={`filter-pill ${selected === "All" ? "active" : ""}`} onClick={() => setSelected("All")} type="button">All items</button>{categories.map((category) => <button key={category.name} className={`filter-pill ${selected === category.name ? "active" : ""}`} onClick={() => setSelected(category.name)} type="button">{category.name}</button>)}</div>
       <label className="result-count">Sort by <select aria-label="Sort products" value={sort} onChange={(event) => setSort(event.target.value)}><option>Featured</option><option>Price: low to high</option><option>Name: A to Z</option></select></label>
     </div>
-    <div className="product-grid">{visible.map((product) => <ProductCard key={product.name} product={product} />)}</div>
+    <div className="product-grid">{visible.map((product) => <ProductCard key={getProductKey(product)} product={product} />)}</div>
     {visible.length === 0 && <div className="empty-state"><h2>No matches just yet</h2><p>Try a different search or browse another aisle.</p><button className="button" onClick={() => { setSelected("All"); window.location.href = "/category/"; }}>Clear search</button></div>}
   </>;
 }

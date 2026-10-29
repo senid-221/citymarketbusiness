@@ -9,6 +9,7 @@ import {
   useState,
 } from "react";
 import products from "@/data/products.json";
+import { getProductKey } from "@/data/store";
 
 export type Product = (typeof products)[number];
 export type CartLine = { product: Product; quantity: number };
@@ -18,8 +19,8 @@ type CartContextValue = {
   count: number;
   subtotal: number;
   add: (product: Product) => void;
-  setQuantity: (name: string, quantity: number) => void;
-  remove: (name: string) => void;
+  setQuantity: (product: Product, quantity: number) => void;
+  remove: (product: Product) => void;
   clear: () => void;
 };
 
@@ -46,10 +47,11 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const add = useCallback((product: Product) => {
     setItems((current) => {
-      const existing = current.find((line) => line.product.name === product.name);
+      const key = getProductKey(product);
+      const existing = current.find((line) => getProductKey(line.product) === key);
       return existing
         ? current.map((line) =>
-            line.product.name === product.name
+            getProductKey(line.product) === key
               ? { ...line, quantity: line.quantity + 1 }
               : line,
           )
@@ -57,18 +59,18 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     });
   }, []);
 
-  const setQuantity = useCallback((name: string, quantity: number) => {
+  const setQuantity = useCallback((product: Product, quantity: number) => {
+    const key = getProductKey(product);
     setItems((current) =>
       quantity < 1
-        ? current.filter((line) => line.product.name !== name)
+        ? current.filter((line) => getProductKey(line.product) !== key)
         : current.map((line) =>
-            line.product.name === name ? { ...line, quantity } : line,
+            getProductKey(line.product) === key ? { ...line, quantity } : line,
           ),
     );
   }, []);
-
   const remove = useCallback(
-    (name: string) => setQuantity(name, 0),
+    (product: Product) => setQuantity(product, 0),
     [setQuantity],
   );
   const clear = useCallback(() => setItems([]), []);

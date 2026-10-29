@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { PageFrame, ProductCard, SectionHeading } from "@/components/store-ui";
-import { catalog, categories } from "@/data/store";
+import { catalog, categories, getProductKey } from "@/data/store";
 
 export default function HomePage() {
   const featured = catalog.slice(0, 8);
@@ -49,13 +49,13 @@ export default function HomePage() {
         <section className="section container">
           <SectionHeading eyebrow="Picked for your table" title="Fresh today" action={<Link className="text-link" href="/category/">See all →</Link>} />
           <div className="product-grid">
-            {featured.map((product) => <ProductCard key={product.name} product={product} />)}
+            {featured.map((product) => <ProductCard key={getProductKey(product)} product={product} />)}
           </div>
         </section>
 
         <section className="promo-strip container">
           <div><span className="eyebrow">A little more good</span><h2>Make room for a new favorite.</h2><p>Browse the neighborhood picks and bring home something wonderful.</p></div>
-          <Link className="promo-aside" href="/category/">A good day<br />starts close by <span aria-hidden="true">↗</span></Link>
+          <Link className="promo-aside" href="/ai-planner/">Plan meals with AI<br />from our real catalog <span aria-hidden="true">↗</span></Link>
         </section>
       </main>
     </PageFrame>

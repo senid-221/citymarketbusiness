@@ -33,6 +33,7 @@
 /out/
 /.next/
 /node_modules/
+/functions/node_modules/
 /tsconfig.tsbuildinfo
 /npm-debug.log*
 

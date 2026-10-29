@@ -26,6 +26,8 @@ jobs:
         run: npm ci
 
       - name: Build web app
+        env:
+          NEXT_PUBLIC_AI_PLANNER_URL: https://us-central1-citymarket-business-c4a7a.cloudfunctions.net/generateGroceryPlan
         run: npm run build
 
       - name: Verify web build

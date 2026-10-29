@@ -66,6 +66,7 @@ export function Header() {
           <nav className="container category-nav" aria-label="Main navigation">
             <Link href="/category/" className="nav-all">☰ <span>Shop all</span></Link>
             {categories.slice(0, 6).map((category) => <Link key={category.name} href={`/category/?category=${encodeURIComponent(category.name)}`}>{category.name}</Link>)}
+            <Link href="/ai-planner/">AI meal planner</Link>
             <Link href="/orders/">My orders</Link>
           </nav>
         </div>
@@ -79,7 +80,7 @@ export function Footer() {
     <footer className="site-footer">
       <div className="container footer-grid">
         <div><Link className="brand footer-brand" href="/"><Image src="/assets/images/app_launcher_icon.png" alt="" width={34} height={34} /><span>citymarket<span className="brand-business">business</span></span></Link><p>Your neighborhood, a little fresher.</p></div>
-        <div><strong>Shop</strong><Link href="/category/">All groceries</Link><Link href="/category/?category=Fruits">Fresh fruit</Link><Link href="/category/?category=Veggies">Vegetables</Link></div>
+        <div><strong>Shop</strong><Link href="/category/">All groceries</Link><Link href="/category/?category=Fruits">Fresh fruit</Link><Link href="/category/?category=Veggies">Vegetables</Link><Link href="/ai-planner/">AI meal planner</Link></div>
         <div><strong>Your account</strong><Link href="/orders/">Order history</Link><Link href="/profile/">Profile & settings</Link><Link href="/sign-in/">Sign in</Link></div>
         <div><strong>Need a hand?</strong><Link href="/help/">Help center</Link><span>Delivery & checkout are demo flows.</span></div>
       </div>
@@ -93,7 +94,7 @@ export function PageFrame({ children }: { children: React.ReactNode }) {
 }
 
 function MobileNav() {
-  return <nav className="mobile-bottom-nav" aria-label="Quick navigation"><Link href="/"><span aria-hidden="true">⌂</span>Home</Link><Link href="/category/"><span aria-hidden="true">☷</span>Shop</Link><Link href="/orders/"><span aria-hidden="true">▤</span>Orders</Link><Link href="/profile/"><span aria-hidden="true">♙</span>Profile</Link></nav>;
+  return <nav className="mobile-bottom-nav" aria-label="Quick navigation"><Link href="/"><span aria-hidden="true">⌂</span>Home</Link><Link href="/category/"><span aria-hidden="true">☷</span>Shop</Link><Link href="/ai-planner/"><span aria-hidden="true">✦</span>Plan</Link><Link href="/orders/"><span aria-hidden="true">▤</span>Orders</Link><Link href="/profile/"><span aria-hidden="true">♙</span>Profile</Link></nav>;
 }
 
 export function SectionHeading({ eyebrow, title, action }: { eyebrow?: string; title: string; action?: React.ReactNode }) {

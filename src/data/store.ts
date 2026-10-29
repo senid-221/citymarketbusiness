@@ -16,4 +16,8 @@ export function formatPrice(value: number) {
   return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(value);
 }
 
+export function getProductKey(product: { name: string; category: string; quantity: string; price: string }) {
+  return JSON.stringify([product.name, product.category, product.quantity, product.price]);
+}
+
 export const catalog = products;
