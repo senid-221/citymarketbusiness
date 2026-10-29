@@ -17,12 +17,24 @@ firebase deploy --only hosting
 The Firebase project is selected by `.firebaserc`; Hosting serves `build/web` and
 rewrites app routes to `index.html`.
 
-For Hostinger Git deployment, use `npm run build` as the build command and `build/web`
-as the publish directory only if the build environment has the Flutter SDK available
-on `PATH`. If Hostinger's build environment does not provide Flutter, build the app
-with Flutter in a local or CI environment and deploy the contents of `build/web` to
-the site's document root (commonly `public_html`). A Node.js environment by itself
-cannot build this Flutter app.
+For Hostinger, `.github/workflows/deploy-hostinger.yml` builds the app with Flutter
+and deploys `build/web` over SSH after changes reach `main`. Enable SSH access in
+Hostinger, then add these repository secrets under **Settings → Secrets and variables
+→ Actions**:
+
+- `HOSTINGER_SSH_HOST`, `HOSTINGER_SSH_PORT`, and `HOSTINGER_SSH_USERNAME` from
+  Hostinger's SSH access details.
+- `HOSTINGER_SSH_PRIVATE_KEY`, the private key for an SSH key authorized on the
+  Hostinger account.
+- `HOSTINGER_SSH_KNOWN_HOSTS`, the verified SSH host-key entry for the Hostinger
+  server and port.
+- `HOSTINGER_DEPLOY_PATH`, the absolute document-root path ending in `/public_html`.
+
+The workflow builds on every push to `main`. If deployment secrets are not yet
+configured, it still builds the site and skips deployment with a warning. After
+adding the secrets, run the workflow manually from the Actions tab to deploy without
+needing another code change. The workflow does not delete other files in the target
+directory.
 
 ## Configure Firebase Authentication
 
