@@ -4,16 +4,25 @@ CityMarket Business is a Flutter app configured for web deployment with Firebase
 
 ## Build and deploy the web app
 
-Install the Flutter stable SDK and Firebase CLI, then authenticate with accounts that
-have access to the Firebase project:
+Install Flutter 3.27 or newer and Firebase CLI, then authenticate with accounts that
+have access to the Firebase project. The npm build script is provided for hosting
+platforms that expect a `package.json`; it delegates to Flutter and does not install
+or provide the Flutter SDK:
 
 ```powershell
-flutter build web --release
+npm run build
 firebase deploy --only hosting
 ```
 
 The Firebase project is selected by `.firebaserc`; Hosting serves `build/web` and
 rewrites app routes to `index.html`.
+
+For Hostinger Git deployment, use `npm run build` as the build command and `build/web`
+as the publish directory only if the build environment has the Flutter SDK available
+on `PATH`. If Hostinger's build environment does not provide Flutter, build the app
+with Flutter in a local or CI environment and deploy the contents of `build/web` to
+the site's document root (commonly `public_html`). A Node.js environment by itself
+cannot build this Flutter app.
 
 ## Configure Firebase Authentication
 
