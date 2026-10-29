@@ -1,59 +1,106 @@
 # CityMarket Business
 
-CityMarket Business is a Flutter app configured for web deployment with Firebase Hosting.
+The repository retains the original Flutter app in `lib/`, `android/`, `ios/`,
+`assets/`, and `web/`. The primary website is a Next.js App Router application.
+Local Flutter assets are copied—not moved—into `public/assets/` and `public/web/`
+so the originals remain intact.
 
-## Build and deploy the web app
+## Run and build the website
 
-Install Flutter 3.47.8 or newer and Firebase CLI, then authenticate with accounts that
-have access to the Firebase project. The npm build script is provided for hosting
-platforms that expect a `package.json`; it delegates to Flutter and does not install
-or provide the Flutter SDK:
+Use Node.js 20+ and npm:
 
 ```powershell
+npm ci
+npm run dev
+npm run lint
+npm run typecheck
+npm run test:functions
 npm run build
-firebase deploy --only hosting
 ```
 
-The Firebase project is selected by `.firebaserc`; Hosting serves `build/web` and
-rewrites app routes to `index.html`.
+`npm run build` creates a static, deployable website in `out/`. Preview the static
+files with any static web server. The exported site does not require a Node server
+at runtime.
 
-For Hostinger, `.github/workflows/deploy-hostinger.yml` builds the app with Flutter
-and deploys `build/web` over SSH after changes reach `main`. Enable SSH access in
-Hostinger, then add these repository secrets under **Settings → Secrets and variables
-→ Actions**:
+## Firebase Authentication
 
-- `HOSTINGER_SSH_HOST`, `HOSTINGER_SSH_PORT`, and `HOSTINGER_SSH_USERNAME` from
-  Hostinger's SSH access details.
-- `HOSTINGER_SSH_PRIVATE_KEY`, the private key for an SSH key authorized on the
-  Hostinger account.
-- `HOSTINGER_SSH_KNOWN_HOSTS`, the verified SSH host-key entry for the Hostinger
-  server and port.
-- `HOSTINGER_DEPLOY_PATH`, the absolute document-root path ending in `/public_html`.
+The sign-in, account creation, and password reset forms use the existing Firebase
+web app configuration from `lib/firebase_options.dart`. Firebase web configuration
+is public client configuration, not a server-side secret. It can be overridden with
+the `NEXT_PUBLIC_FIREBASE_*` variables listed in `.env.example`.
 
-The workflow builds on every push to `main`. If deployment secrets are not yet
-configured, it still builds the site and skips deployment with a warning. After
-adding the secrets, run the workflow manually from the Actions tab on `main` to deploy
-without needing another code change. The workflow does not delete other files in the
-target directory.
+Enable **Email/Password** in Firebase Console under **Authentication → Sign-in
+method**, and add the production hostname to **Authentication → Settings →
+Authorized domains**. Google, Facebook, and Apple sign-in are not wired up; they
+require provider setup and OAuth credentials in Firebase Console. Firebase Auth
+does not provide product inventory, customer profiles, order storage, or payments.
 
-## Configure Firebase Authentication
+## AI grocery planner
 
-The web app is initialized with the registered Firebase web app. In Firebase Console,
-enable **Email/Password** under **Authentication → Sign-in method**. The app also
-offers Google, Facebook, and Apple sign-in; enable and configure each provider before
-using its button. Add `citymarketbusiness.com` to Authentication's authorized domains
-after the custom domain is verified. Firebase Auth is currently configured for web;
-native Android and iOS apps need their own registered-app configuration before auth
-can be used on those platforms.
+The website's meal planner uses Gemini through a Firebase HTTPS Function; it is
+not a client-side mock. A signed-in Firebase user can request up to five plans
+per day. The function checks generated product IDs against its bundled catalog,
+computes the estimate from catalog prices, and rejects plans that exceed the
+requested budget.
 
-Product catalog, customer profiles, order storage, and payment processing are not
-connected by Firebase Auth alone. They require a Firestore data model and security
-rules, plus a payment provider and trusted server-side payment integration.
+To enable it in the Firebase project:
 
-## Connect the custom domain
+1. Use a Firebase project on the Blaze plan, enable Firestore and the
+   Generative Language API, and install the Firebase CLI.
+2. Set the Gemini API key as a Functions secret (never as a `NEXT_PUBLIC_*`
+   variable):
 
-In the Firebase Console for `citymarket-business-c4a7a`, open **Hosting**, add
-`citymarketbusiness.com` as a custom domain, and follow Firebase's ownership
-verification and DNS instructions at the domain provider. Firebase provisions HTTPS
-after DNS verification propagates. The domain cannot go live until those external
-steps are completed.
+   ```powershell
+   firebase functions:secrets:set GEMINI_API_KEY
+   ```
+
+3. Deploy the function and its private usage rules:
+
+   ```powershell
+   firebase deploy --only functions:generateGroceryPlan,firestore:rules
+   ```
+
+4. For local development, set the public `NEXT_PUBLIC_AI_PLANNER_URL` in
+   `.env.local` to the function URL. The endpoint accepts browser origins but
+   still requires a valid Firebase ID token and enforces the per-account quota.
+
+The Hostinger GitHub Actions build includes the configured public function URL.
+Gemini credentials are not required at build time. The AI integration is
+unavailable until the function, Firestore, Gemini API, and secret are configured
+and deployed. Generated recipes may be inaccurate and are not medical or dietary
+advice; always check product labels.
+
+## Hostinger deployment
+
+The GitHub Actions workflow builds the static site on pushes to `main` and uploads
+`out/` to the configured Hostinger document root. It does not deploy unless all of
+these Actions repository secrets are present:
+
+- `HOSTINGER_SSH_HOST`
+- `HOSTINGER_SSH_PORT`
+- `HOSTINGER_SSH_USERNAME`
+- `HOSTINGER_SSH_PRIVATE_KEY`
+- `HOSTINGER_SSH_KNOWN_HOSTS`
+- `HOSTINGER_DEPLOY_PATH` (absolute path ending in `/public_html`)
+
+Without those secrets the workflow still builds and verifies the deployable output,
+then emits a setup warning and skips SSH deployment. Deployment is not run from this
+workspace.
+
+## Scope and known limitations
+
+The website implements the storefront, category/search filters, product details,
+browser-persisted cart, demo checkout/confirmation, sign-in/up/reset, profile,
+notifications, help, and an authenticated AI meal planner. Product names, categories, pack sizes, and prices
+come from the Flutter app's local `FFAppState` catalog. That source has no local
+product photographs; the website uses labeled color placeholders rather than
+hotlinked images. The original source references some FlutterFlow-hosted product
+images, which are not pulled into the web bundle.
+
+Cart contents persist in this browser. Checkout is only a local preview: it does not
+send or store orders and does not process payments. Order tracking, delivery maps,
+delivery chat/calls, ratings, saved addresses/payment methods, support tickets,
+and the remaining Flutter-only screens are not connected or ported to web. These
+depend on app-specific services and/or native Flutter workflows. Original mobile
+sources/assets are retained, and the native app identifier is now
+`com.citymarketbusiness.app`.
