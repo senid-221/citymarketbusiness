@@ -68,6 +68,7 @@ function createPrompt(preferences, catalog) {
     "Include every product used in a recipe in the shopping list.",
     "Use short, safe cooking instructions. Do not make medical or dietary safety guarantees.",
     "Shopping-list units mean packages from the catalog; use positive integers.",
+    "Return no more than 13 unique shopping-list products.",
     "Return exactly the requested number of meals. Keep the sum of catalog package prices within the budget where possible.",
     `Meal goal: ${preferences.goal}`,
     `Servings per meal: ${preferences.servings}`,
@@ -156,7 +157,7 @@ function parseGeneratedPlan(text, preferences, catalog) {
     return { productId: product.id, product, units: line.units };
   });
 
-  if (shoppingList.length < 1 || shoppingList.length > 30) {
+  if (shoppingList.length < 1 || shoppingList.length > 13) {
     throw new Error("The meal planner returned an invalid shopping list. Please try again.");
   }
 

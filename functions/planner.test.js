@@ -78,6 +78,30 @@ test("returns prices calculated from the server catalog", () => {
   assert.equal(plan.shoppingList[0].price, "$4.99");
 });
 
+test("rejects shopping lists that exceed the Flutter suggestion screen capacity", () => {
+  const generated = {
+    title: "Apple lunch",
+    summary: "A simple meal.",
+    meals: [
+      {
+        name: "Apple salad",
+        day: 1,
+        ingredients: [{ productId: "product-1", amount: "1 cup, sliced" }],
+        steps: ["Slice and serve."],
+      },
+    ],
+    shoppingList: Array.from({ length: 14 }, () => ({
+      productId: "product-1",
+      units: 1,
+    })),
+  };
+
+  assert.throws(
+    () => parseGeneratedPlan(JSON.stringify(generated), preferences, catalog),
+    /invalid shopping list/,
+  );
+});
+
 test("rejects invented products and plans over budget", () => {
   const generated = {
     title: "Invalid",

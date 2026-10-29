@@ -305,6 +305,24 @@ class FFAppState extends ChangeNotifier {
     _LocaationSelected = value;
   }
 
+  String _aiPlannerShoppingFrequency = '';
+  String get aiPlannerShoppingFrequency => _aiPlannerShoppingFrequency;
+  set aiPlannerShoppingFrequency(String value) {
+    _aiPlannerShoppingFrequency = value;
+  }
+
+  String _aiPlannerMealStyle = '';
+  String get aiPlannerMealStyle => _aiPlannerMealStyle;
+  set aiPlannerMealStyle(String value) {
+    _aiPlannerMealStyle = value;
+  }
+
+  String _aiPlannerDietaryPreference = '';
+  String get aiPlannerDietaryPreference => _aiPlannerDietaryPreference;
+  set aiPlannerDietaryPreference(String value) {
+    _aiPlannerDietaryPreference = value;
+  }
+
   List<VegetablesList1Struct> _vegetablesList1 = [
     VegetablesList1Struct.fromSerializableMap(jsonDecode(
         '{\"image\":\"https://storage.googleapis.com/flutterflow-io-6f20.appspot.com/projects/assets-3ajpcu/assets/js31tsa4pk9q/Rectangle_126-7-removebg-preview.png\",\"name\":\"Organic lemon\",\"quantity\":\"4 Pic\",\"price\":\"\$1.22\"}')),

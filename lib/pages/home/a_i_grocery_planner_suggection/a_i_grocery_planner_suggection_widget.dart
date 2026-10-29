@@ -261,7 +261,7 @@ class _AIGroceryPlannerSuggectionWidgetState
                                   children: [
                                     Text(
                                       FFLocalizations.of(context).getText(
-                                        'hvbcodo5' /* Vegetables */,
+                                        'hvbcodo5' /* Your shopping list */,
                                       ),
                                       style: FlutterFlowTheme.of(context)
                                           .bodyMedium
@@ -335,7 +335,7 @@ class _AIGroceryPlannerSuggectionWidgetState
                                   children: [
                                     Text(
                                       FFLocalizations.of(context).getText(
-                                        'lrab6vy8' /* Dairy */,
+                                        'lrab6vy8' /* More from your plan */,
                                       ),
                                       style: FlutterFlowTheme.of(context)
                                           .bodyMedium
