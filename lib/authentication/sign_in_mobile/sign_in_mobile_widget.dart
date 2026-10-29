@@ -847,6 +847,7 @@ class _SignInMobileWidgetState extends State<SignInMobileWidget>
                                         updateCallback: () =>
                                             safeSetState(() {}),
                                         child: SocialLoginBtnWidget(
+                                          providerId: 'facebook.com',
                                           logo:
                                               'https://storage.googleapis.com/flutterflow-io-6f20.appspot.com/projects/assets-3ajpcu/assets/pqetxa87ekja/Facebook.svg',
                                         ),
@@ -858,6 +859,7 @@ class _SignInMobileWidgetState extends State<SignInMobileWidget>
                                         updateCallback: () =>
                                             safeSetState(() {}),
                                         child: SocialLoginBtnWidget(
+                                          providerId: 'google.com',
                                           logo:
                                               'https://storage.googleapis.com/flutterflow-io-6f20.appspot.com/projects/assets-3ajpcu/assets/rtanb0p1vu0v/google-logo-search-new.svg',
                                         ),
@@ -869,6 +871,7 @@ class _SignInMobileWidgetState extends State<SignInMobileWidget>
                                         updateCallback: () =>
                                             safeSetState(() {}),
                                         child: SocialLoginBtnWidget(
+                                          providerId: 'apple.com',
                                           logo:
                                               'https://storage.googleapis.com/flutterflow-io-6f20.appspot.com/projects/assets-3ajpcu/assets/xwe05ke2lsv9/Apple_Logo_White.svg',
                                         ),
