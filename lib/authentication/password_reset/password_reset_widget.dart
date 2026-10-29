@@ -1,17 +1,22 @@
 import '/components/custom_button/custom_button_widget.dart';
+import '/backend/firebase_auth_service.dart';
 import '/flutter_flow/flutter_flow_animations.dart';
 import '/flutter_flow/flutter_flow_icon_button.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
+
 import 'dart:math';
 import 'dart:ui';
-import '/index.dart';
+
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+
 import 'password_reset_model.dart';
 export 'password_reset_model.dart';
 
@@ -62,12 +67,45 @@ class _PasswordResetWidgetState extends State<PasswordResetWidget>
         ],
       ),
     });
+  }
 
-    WidgetsBinding.instance.addPostFrameCallback((_) => safeSetState(() {
-          _model.textController?.text = FFLocalizations.of(context).getText(
-            'fua4nyy8' /* james998556@gmail.com */,
-          );
-        }));
+  bool _isSubmitting = false;
+
+  void _showAuthMessage(String message) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  Future<void> _sendPasswordReset() async {
+    final email = _model.textController?.text.trim() ?? '';
+    if (!RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(email)) {
+      _showAuthMessage('Enter a valid email address.');
+      return;
+    }
+    if (_isSubmitting) return;
+
+    safeSetState(() => _isSubmitting = true);
+    try {
+      await FirebaseAuthService.sendPasswordResetEmail(email);
+      if (!mounted) return;
+      _showAuthMessage(
+        'If an account exists for this email, a password reset link has been sent.',
+      );
+    } on FirebaseAuthException catch (error) {
+      _showAuthMessage(
+        error.code == 'user-not-found'
+            ? 'If an account exists for this email, a password reset link has been sent.'
+            : FirebaseAuthService.errorMessage(error),
+      );
+    } on FirebaseException catch (error) {
+      _showAuthMessage(error.message ?? 'Firebase password reset failed.');
+    } on StateError catch (error) {
+      _showAuthMessage(error.message.toString());
+    } finally {
+      if (mounted) safeSetState(() => _isSubmitting = false);
+    }
   }
 
   @override
@@ -112,8 +150,8 @@ class _PasswordResetWidgetState extends State<PasswordResetWidget>
                           borderColor: Colors.transparent,
                           borderRadius: 12.0,
                           buttonSize: 40.0,
-                          fillColor:
-                              FlutterFlowTheme.of(context).primaryBackground,
+                          fillColor: FlutterFlowTheme.of(context)
+                              .primaryBackground,
                           icon: Icon(
                             Icons.arrow_back,
                             color: FlutterFlowTheme.of(context).primaryText,
@@ -129,15 +167,23 @@ class _PasswordResetWidgetState extends State<PasswordResetWidget>
                 ),
                 Expanded(
                   child: Padding(
-                    padding:
-                        EdgeInsetsDirectional.fromSTEB(20.0, 0.0, 20.0, 0.0),
+                    padding: EdgeInsetsDirectional.fromSTEB(
+                      20.0,
+                      0.0,
+                      20.0,
+                      0.0,
+                    ),
                     child: Column(
                       mainAxisSize: MainAxisSize.max,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Padding(
                           padding: EdgeInsetsDirectional.fromSTEB(
-                              0.0, 44.0, 0.0, 0.0),
+                            0.0,
+                            44.0,
+                            0.0,
+                            0.0,
+                          ),
                           child: Column(
                             mainAxisSize: MainAxisSize.max,
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -146,8 +192,7 @@ class _PasswordResetWidgetState extends State<PasswordResetWidget>
                                 FFLocalizations.of(context).getText(
                                   '3m6btf7q' /* Reset your password 🔑 */,
                                 ),
-                                style: FlutterFlowTheme.of(context)
-                                    .bodyMedium
+                                style: FlutterFlowTheme.of(context).bodyMedium
                                     .override(
                                       font: GoogleFonts.plusJakartaSans(
                                         fontWeight: FontWeight.bold,
@@ -168,8 +213,7 @@ class _PasswordResetWidgetState extends State<PasswordResetWidget>
                                   'hj97kx2h' /* Please enter your email and we... */,
                                 ),
                                 textAlign: TextAlign.start,
-                                style: FlutterFlowTheme.of(context)
-                                    .bodyMedium
+                                style: FlutterFlowTheme.of(context).bodyMedium
                                     .override(
                                       font: GoogleFonts.plusJakartaSans(
                                         fontWeight: FontWeight.normal,
@@ -196,11 +240,9 @@ class _PasswordResetWidgetState extends State<PasswordResetWidget>
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              FFLocalizations.of(context).getText(
-                                'oroshdj3' /* Email */,
-                              ),
-                              style: FlutterFlowTheme.of(context)
-                                  .bodyMedium
+                              FFLocalizations.of(context)
+                                  .getText('oroshdj3' /* Email */),
+                              style: FlutterFlowTheme.of(context).bodyMedium
                                   .override(
                                     font: GoogleFonts.plusJakartaSans(
                                       fontWeight: FontWeight.w500,
@@ -230,14 +272,12 @@ class _PasswordResetWidgetState extends State<PasswordResetWidget>
                                       .labelMedium
                                       .override(
                                         font: GoogleFonts.plusJakartaSans(
-                                          fontWeight:
-                                              FlutterFlowTheme.of(context)
-                                                  .labelMedium
-                                                  .fontWeight,
-                                          fontStyle:
-                                              FlutterFlowTheme.of(context)
-                                                  .labelMedium
-                                                  .fontStyle,
+                                          fontWeight: FlutterFlowTheme.of(
+                                            context,
+                                          ).labelMedium.fontWeight,
+                                          fontStyle: FlutterFlowTheme.of(
+                                            context,
+                                          ).labelMedium.fontStyle,
                                         ),
                                         color: FlutterFlowTheme.of(context)
                                             .secondaryText,
@@ -254,14 +294,12 @@ class _PasswordResetWidgetState extends State<PasswordResetWidget>
                                       .labelMedium
                                       .override(
                                         font: GoogleFonts.plusJakartaSans(
-                                          fontWeight:
-                                              FlutterFlowTheme.of(context)
-                                                  .labelMedium
-                                                  .fontWeight,
-                                          fontStyle:
-                                              FlutterFlowTheme.of(context)
-                                                  .labelMedium
-                                                  .fontStyle,
+                                          fontWeight: FlutterFlowTheme.of(
+                                            context,
+                                          ).labelMedium.fontWeight,
+                                          fontStyle: FlutterFlowTheme.of(
+                                            context,
+                                          ).labelMedium.fontStyle,
                                         ),
                                         fontSize: 13.0,
                                         letterSpacing: 0.0,
@@ -282,8 +320,8 @@ class _PasswordResetWidgetState extends State<PasswordResetWidget>
                                   ),
                                   focusedBorder: OutlineInputBorder(
                                     borderSide: BorderSide(
-                                      color:
-                                          FlutterFlowTheme.of(context).primary,
+                                      color: FlutterFlowTheme.of(context)
+                                          .primary,
                                       width: 1.0,
                                     ),
                                     borderRadius: BorderRadius.circular(12.0),
@@ -307,7 +345,11 @@ class _PasswordResetWidgetState extends State<PasswordResetWidget>
                                       .secondaryBackground,
                                   contentPadding:
                                       EdgeInsetsDirectional.fromSTEB(
-                                          14.0, 20.0, 14.0, 20.0),
+                                        14.0,
+                                        20.0,
+                                        14.0,
+                                        20.0,
+                                      ),
                                   prefixIcon: Icon(
                                     FFIcons.kmail,
                                     color: FlutterFlowTheme.of(context)
@@ -315,8 +357,7 @@ class _PasswordResetWidgetState extends State<PasswordResetWidget>
                                     size: 20.0,
                                   ),
                                 ),
-                                style: FlutterFlowTheme.of(context)
-                                    .bodyMedium
+                                style: FlutterFlowTheme.of(context).bodyMedium
                                     .override(
                                       font: GoogleFonts.plusJakartaSans(
                                         fontWeight: FontWeight.w500,
@@ -331,8 +372,8 @@ class _PasswordResetWidgetState extends State<PasswordResetWidget>
                                           .bodyMedium
                                           .fontStyle,
                                     ),
-                                cursorColor:
-                                    FlutterFlowTheme.of(context).primaryText,
+                                cursorColor: FlutterFlowTheme.of(context)
+                                    .primaryText,
                                 validator: _model.textControllerValidator
                                     .asValidator(context),
                               ),
@@ -352,29 +393,23 @@ class _PasswordResetWidgetState extends State<PasswordResetWidget>
                       color: FlutterFlowTheme.of(context).alternate,
                     ),
                     Padding(
-                      padding:
-                          EdgeInsetsDirectional.fromSTEB(14.0, 0.0, 14.0, 0.0),
-                      child: wrapWithModel(
-                        model: _model.customButtonModel,
-                        updateCallback: () => safeSetState(() {}),
-                        child: CustomButtonWidget(
-                          title: 'Continue',
-                          action: () async {
-                            context.pushNamed(
-                              PasswordResetOTPWidget.routeName,
-                              extra: <String, dynamic>{
-                                '__transition_info__': TransitionInfo(
-                                  hasTransition: true,
-                                  transitionType:
-                                      PageTransitionType.rightToLeft,
-                                  duration: Duration(milliseconds: 300),
-                                ),
-                              },
-                            );
-                          },
-                        ),
-                      ).animateOnPageLoad(
-                          animationsMap['customButtonOnPageLoadAnimation']!),
+                      padding: EdgeInsetsDirectional.fromSTEB(
+                        14.0,
+                        0.0,
+                        14.0,
+                        0.0,
+                      ),
+                      child:
+                          wrapWithModel(
+                            model: _model.customButtonModel,
+                            updateCallback: () => safeSetState(() {}),
+                            child: CustomButtonWidget(
+                              title: _isSubmitting ? 'Sending…' : 'Continue',
+                              action: _sendPasswordReset,
+                            ),
+                          ).animateOnPageLoad(
+                            animationsMap['customButtonOnPageLoadAnimation']!,
+                          ),
                     ),
                   ].divide(SizedBox(height: 20.0)),
                 ),

@@ -1,12 +1,17 @@
-import '/authentication/components/login_progress_modal/login_progress_modal_widget.dart';
+import '/backend/firebase_auth_service.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
+
 import 'dart:ui';
+
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+
 import 'social_login_btn_model.dart';
 export 'social_login_btn_model.dart';
 
@@ -14,9 +19,11 @@ class SocialLoginBtnWidget extends StatefulWidget {
   const SocialLoginBtnWidget({
     super.key,
     required this.logo,
+    required this.providerId,
   });
 
   final String? logo;
+  final String providerId;
 
   @override
   State<SocialLoginBtnWidget> createState() => _SocialLoginBtnWidgetState();
@@ -53,20 +60,34 @@ class _SocialLoginBtnWidgetState extends State<SocialLoginBtnWidget> {
         hoverColor: Colors.transparent,
         highlightColor: Colors.transparent,
         onTap: () async {
-          await showDialog(
-            barrierColor: Color(0x65000000),
-            context: context,
-            builder: (dialogContext) {
-              return Dialog(
-                elevation: 0,
-                insetPadding: EdgeInsets.zero,
-                backgroundColor: Colors.transparent,
-                alignment: AlignmentDirectional(0.0, 0.0)
-                    .resolve(Directionality.of(context)),
-                child: LoginProgressModalWidget(),
+          try {
+            final credential = await FirebaseAuthService.signInWithProvider(
+              widget.providerId,
+            );
+            FirebaseAuthService.syncDisplayName(credential);
+            if (mounted) context.goNamed('Home');
+          } on FirebaseAuthException catch (error) {
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(FirebaseAuthService.errorMessage(error)),
+                ),
               );
-            },
-          );
+            }
+          } on FirebaseException catch (error) {
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(error.message ?? 'Firebase sign-in failed.'),
+                ),
+              );
+            }
+          } on StateError catch (error) {
+            if (mounted) {
+              ScaffoldMessenger.of(context)
+                  .showSnackBar(SnackBar(content: Text(error.message)));
+            }
+          }
         },
         child: Container(
           width: 100.0,
@@ -74,9 +95,7 @@ class _SocialLoginBtnWidgetState extends State<SocialLoginBtnWidget> {
           decoration: BoxDecoration(
             color: FlutterFlowTheme.of(context).senary,
             borderRadius: BorderRadius.circular(16.0),
-            border: Border.all(
-              color: FlutterFlowTheme.of(context).alternate,
-            ),
+            border: Border.all(color: FlutterFlowTheme.of(context).alternate),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.max,

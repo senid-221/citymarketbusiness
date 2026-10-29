@@ -1,4 +1,3 @@
-import '/authentication/components/login_progress_modal/login_progress_modal_widget.dart';
 import '/authentication/components/social_login_btn/social_login_btn_widget.dart';
 import '/components/custom_button/custom_button_widget.dart';
 import '/flutter_flow/flutter_flow_animations.dart';
@@ -6,17 +5,24 @@ import '/flutter_flow/flutter_flow_icon_button.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
+
 import 'dart:math';
 import 'dart:ui';
+
 import '/flutter_flow/random_data_util.dart' as random_data;
 import '/index.dart';
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+
+import '/backend/firebase_auth_service.dart';
 import 'sign_up_model.dart';
 export 'sign_up_model.dart';
 
@@ -37,6 +43,7 @@ class _SignUpWidgetState extends State<SignUpWidget>
   final scaffoldKey = GlobalKey<ScaffoldState>();
 
   final animationsMap = <String, AnimationInfo>{};
+  bool _isSubmitting = false;
 
   @override
   void initState() {
@@ -61,11 +68,12 @@ class _SignUpWidgetState extends State<SignUpWidget>
             delay: 0.0.ms,
             duration: 400.0.ms,
             begin: Offset(
-                0.0,
-                valueOrDefault<double>(
-                  random_data.randomInteger(400, 400).toDouble(),
-                  400.0,
-                )),
+              0.0,
+              valueOrDefault<double>(
+                random_data.randomInteger(400, 400).toDouble(),
+                400.0,
+              ),
+            ),
             end: Offset(0.0, 0.0),
           ),
           FadeEffect(
@@ -78,12 +86,59 @@ class _SignUpWidgetState extends State<SignUpWidget>
         ],
       ),
     });
+  }
 
-    WidgetsBinding.instance.addPostFrameCallback((_) => safeSetState(() {
-          _model.textController3?.text = FFLocalizations.of(context).getText(
-            'igdm6hmn' /* 12345678 */,
-          );
-        }));
+  void _showAuthMessage(String message) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  Future<void> _createAccount() async {
+    final name = _model.textController1?.text.trim() ?? '';
+    final email = _model.textController2?.text.trim() ?? '';
+    final password = _model.textController3?.text ?? '';
+    if (name.isEmpty) {
+      _showAuthMessage('Enter your name.');
+      return;
+    }
+    if (!RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(email)) {
+      _showAuthMessage('Enter a valid email address.');
+      return;
+    }
+    if (password.length < 6) {
+      _showAuthMessage('Choose a password with at least 6 characters.');
+      return;
+    }
+    if (_model.checkboxValue != true) {
+      _showAuthMessage('Please accept the privacy and data terms to continue.');
+      return;
+    }
+    if (_isSubmitting) return;
+
+    safeSetState(() => _isSubmitting = true);
+    try {
+      await FirebaseAuthService.createAccount(
+        name: name,
+        email: email,
+        password: password,
+      );
+      if (!mounted) return;
+      FFAppState().update(() => FFAppState().name = name);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Your CityMarket account is ready.')),
+      );
+      context.goNamed(HomeWidget.routeName);
+    } on FirebaseAuthException catch (error) {
+      _showAuthMessage(FirebaseAuthService.errorMessage(error));
+    } on FirebaseException catch (error) {
+      _showAuthMessage(error.message ?? 'Firebase account creation failed.');
+    } on StateError catch (error) {
+      _showAuthMessage(error.message);
+    } finally {
+      if (mounted) safeSetState(() => _isSubmitting = false);
+    }
   }
 
   @override
@@ -110,8 +165,12 @@ class _SignUpWidgetState extends State<SignUpWidget>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
-                  padding:
-                      EdgeInsetsDirectional.fromSTEB(14.0, 20.0, 14.0, 0.0),
+                  padding: EdgeInsetsDirectional.fromSTEB(
+                    14.0,
+                    20.0,
+                    14.0,
+                    0.0,
+                  ),
                   child: Row(
                     mainAxisSize: MainAxisSize.max,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -136,7 +195,7 @@ class _SignUpWidgetState extends State<SignUpWidget>
                           gradient: LinearGradient(
                             colors: [
                               FlutterFlowTheme.of(context).primary,
-                              FlutterFlowTheme.of(context).gradient
+                              FlutterFlowTheme.of(context).gradient,
                             ],
                             stops: [0.0, 1.0],
                             begin: AlignmentDirectional(-1.0, 0.0),
@@ -165,8 +224,12 @@ class _SignUpWidgetState extends State<SignUpWidget>
                 ),
                 Expanded(
                   child: Padding(
-                    padding:
-                        EdgeInsetsDirectional.fromSTEB(16.0, 0.0, 16.0, 0.0),
+                    padding: EdgeInsetsDirectional.fromSTEB(
+                      16.0,
+                      0.0,
+                      16.0,
+                      0.0,
+                    ),
                     child: Column(
                       mainAxisSize: MainAxisSize.max,
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -180,8 +243,7 @@ class _SignUpWidgetState extends State<SignUpWidget>
                                 text: FFLocalizations.of(context).getText(
                                   'wr5tppnu' /* Create New Account🔒 */,
                                 ),
-                                style: FlutterFlowTheme.of(context)
-                                    .bodyMedium
+                                style: FlutterFlowTheme.of(context).bodyMedium
                                     .override(
                                       font: GoogleFonts.plusJakartaSans(
                                         fontWeight: FontWeight.bold,
@@ -197,10 +259,9 @@ class _SignUpWidgetState extends State<SignUpWidget>
                                           .fontStyle,
                                       lineHeight: 1.4,
                                     ),
-                              )
+                              ),
                             ],
-                            style: FlutterFlowTheme.of(context)
-                                .bodyMedium
+                            style: FlutterFlowTheme.of(context).bodyMedium
                                 .override(
                                   font: GoogleFonts.plusJakartaSans(
                                     fontWeight: FontWeight.bold,
@@ -224,8 +285,7 @@ class _SignUpWidgetState extends State<SignUpWidget>
                             'ufgngrx3' /* Create your account in second!... */,
                           ),
                           textAlign: TextAlign.start,
-                          style: FlutterFlowTheme.of(context)
-                              .bodyMedium
+                          style: FlutterFlowTheme.of(context).bodyMedium
                               .override(
                                 font: GoogleFonts.plusJakartaSans(
                                   fontWeight: FlutterFlowTheme.of(context)
@@ -235,8 +295,8 @@ class _SignUpWidgetState extends State<SignUpWidget>
                                       .bodyMedium
                                       .fontStyle,
                                 ),
-                                color:
-                                    FlutterFlowTheme.of(context).secondaryText,
+                                color: FlutterFlowTheme.of(context)
+                                    .secondaryText,
                                 fontSize: 14.0,
                                 letterSpacing: 0.0,
                                 fontWeight: FlutterFlowTheme.of(context)
@@ -259,11 +319,8 @@ class _SignUpWidgetState extends State<SignUpWidget>
                       BoxShadow(
                         blurRadius: 60.0,
                         color: FlutterFlowTheme.of(context).shadow,
-                        offset: Offset(
-                          0.0,
-                          2.0,
-                        ),
-                      )
+                        offset: Offset(0.0, 2.0),
+                      ),
                     ],
                     borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(24.0),
@@ -283,7 +340,11 @@ class _SignUpWidgetState extends State<SignUpWidget>
                       ),
                       child: Padding(
                         padding: EdgeInsetsDirectional.fromSTEB(
-                            16.0, 20.0, 16.0, 20.0),
+                          16.0,
+                          20.0,
+                          16.0,
+                          20.0,
+                        ),
                         child: Column(
                           mainAxisSize: MainAxisSize.max,
                           children: [
@@ -292,18 +353,15 @@ class _SignUpWidgetState extends State<SignUpWidget>
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  FFLocalizations.of(context).getText(
-                                    'z7blfiq4' /* Name  */,
-                                  ),
-                                  style: FlutterFlowTheme.of(context)
-                                      .bodyMedium
+                                  FFLocalizations.of(context)
+                                      .getText('z7blfiq4' /* Name  */),
+                                  style: FlutterFlowTheme.of(context).bodyMedium
                                       .override(
                                         font: GoogleFonts.plusJakartaSans(
                                           fontWeight: FontWeight.w500,
-                                          fontStyle:
-                                              FlutterFlowTheme.of(context)
-                                                  .bodyMedium
-                                                  .fontStyle,
+                                          fontStyle: FlutterFlowTheme.of(
+                                            context,
+                                          ).bodyMedium.fontStyle,
                                         ),
                                         color: FlutterFlowTheme.of(context)
                                             .secondaryText,
@@ -328,55 +386,47 @@ class _SignUpWidgetState extends State<SignUpWidget>
                                           .labelMedium
                                           .override(
                                             font: GoogleFonts.plusJakartaSans(
-                                              fontWeight:
-                                                  FlutterFlowTheme.of(context)
-                                                      .labelMedium
-                                                      .fontWeight,
-                                              fontStyle:
-                                                  FlutterFlowTheme.of(context)
-                                                      .labelMedium
-                                                      .fontStyle,
+                                              fontWeight: FlutterFlowTheme.of(
+                                                context,
+                                              ).labelMedium.fontWeight,
+                                              fontStyle: FlutterFlowTheme.of(
+                                                context,
+                                              ).labelMedium.fontStyle,
                                             ),
                                             color: FlutterFlowTheme.of(context)
                                                 .secondaryText,
                                             fontSize: 13.0,
                                             letterSpacing: 0.0,
-                                            fontWeight:
-                                                FlutterFlowTheme.of(context)
-                                                    .labelMedium
-                                                    .fontWeight,
-                                            fontStyle:
-                                                FlutterFlowTheme.of(context)
-                                                    .labelMedium
-                                                    .fontStyle,
+                                            fontWeight: FlutterFlowTheme.of(
+                                              context,
+                                            ).labelMedium.fontWeight,
+                                            fontStyle: FlutterFlowTheme.of(
+                                              context,
+                                            ).labelMedium.fontStyle,
                                           ),
-                                      hintText:
-                                          FFLocalizations.of(context).getText(
-                                        'lcer2jok' /* Enter your name... */,
-                                      ),
+                                      hintText: FFLocalizations.of(context)
+                                          .getText(
+                                            'lcer2jok' /* Enter your name... */,
+                                          ),
                                       hintStyle: FlutterFlowTheme.of(context)
                                           .labelMedium
                                           .override(
                                             font: GoogleFonts.plusJakartaSans(
-                                              fontWeight:
-                                                  FlutterFlowTheme.of(context)
-                                                      .labelMedium
-                                                      .fontWeight,
-                                              fontStyle:
-                                                  FlutterFlowTheme.of(context)
-                                                      .labelMedium
-                                                      .fontStyle,
+                                              fontWeight: FlutterFlowTheme.of(
+                                                context,
+                                              ).labelMedium.fontWeight,
+                                              fontStyle: FlutterFlowTheme.of(
+                                                context,
+                                              ).labelMedium.fontStyle,
                                             ),
                                             fontSize: 13.0,
                                             letterSpacing: 0.0,
-                                            fontWeight:
-                                                FlutterFlowTheme.of(context)
-                                                    .labelMedium
-                                                    .fontWeight,
-                                            fontStyle:
-                                                FlutterFlowTheme.of(context)
-                                                    .labelMedium
-                                                    .fontStyle,
+                                            fontWeight: FlutterFlowTheme.of(
+                                              context,
+                                            ).labelMedium.fontWeight,
+                                            fontStyle: FlutterFlowTheme.of(
+                                              context,
+                                            ).labelMedium.fontStyle,
                                           ),
                                       enabledBorder: OutlineInputBorder(
                                         borderSide: BorderSide(
@@ -384,8 +434,9 @@ class _SignUpWidgetState extends State<SignUpWidget>
                                               .alternate,
                                           width: 1.0,
                                         ),
-                                        borderRadius:
-                                            BorderRadius.circular(16.0),
+                                        borderRadius: BorderRadius.circular(
+                                          16.0,
+                                        ),
                                       ),
                                       focusedBorder: OutlineInputBorder(
                                         borderSide: BorderSide(
@@ -393,8 +444,9 @@ class _SignUpWidgetState extends State<SignUpWidget>
                                               .primary,
                                           width: 1.0,
                                         ),
-                                        borderRadius:
-                                            BorderRadius.circular(16.0),
+                                        borderRadius: BorderRadius.circular(
+                                          16.0,
+                                        ),
                                       ),
                                       errorBorder: OutlineInputBorder(
                                         borderSide: BorderSide(
@@ -402,8 +454,9 @@ class _SignUpWidgetState extends State<SignUpWidget>
                                               .error,
                                           width: 1.0,
                                         ),
-                                        borderRadius:
-                                            BorderRadius.circular(16.0),
+                                        borderRadius: BorderRadius.circular(
+                                          16.0,
+                                        ),
                                       ),
                                       focusedErrorBorder: OutlineInputBorder(
                                         borderSide: BorderSide(
@@ -411,15 +464,20 @@ class _SignUpWidgetState extends State<SignUpWidget>
                                               .error,
                                           width: 1.0,
                                         ),
-                                        borderRadius:
-                                            BorderRadius.circular(16.0),
+                                        borderRadius: BorderRadius.circular(
+                                          16.0,
+                                        ),
                                       ),
                                       filled: true,
-                                      fillColor:
-                                          FlutterFlowTheme.of(context).senary,
+                                      fillColor: FlutterFlowTheme.of(context)
+                                          .senary,
                                       contentPadding:
                                           EdgeInsetsDirectional.fromSTEB(
-                                              14.0, 22.0, 14.0, 22.0),
+                                            14.0,
+                                            22.0,
+                                            14.0,
+                                            22.0,
+                                          ),
                                       hoverColor: Colors.transparent,
                                     ),
                                     style: FlutterFlowTheme.of(context)
@@ -427,18 +485,16 @@ class _SignUpWidgetState extends State<SignUpWidget>
                                         .override(
                                           font: GoogleFonts.plusJakartaSans(
                                             fontWeight: FontWeight.w500,
-                                            fontStyle:
-                                                FlutterFlowTheme.of(context)
-                                                    .bodyMedium
-                                                    .fontStyle,
+                                            fontStyle: FlutterFlowTheme.of(
+                                              context,
+                                            ).bodyMedium.fontStyle,
                                           ),
                                           fontSize: 13.0,
                                           letterSpacing: 0.0,
                                           fontWeight: FontWeight.w500,
-                                          fontStyle:
-                                              FlutterFlowTheme.of(context)
-                                                  .bodyMedium
-                                                  .fontStyle,
+                                          fontStyle: FlutterFlowTheme.of(
+                                            context,
+                                          ).bodyMedium.fontStyle,
                                         ),
                                     cursorColor: FlutterFlowTheme.of(context)
                                         .primaryText,
@@ -453,18 +509,15 @@ class _SignUpWidgetState extends State<SignUpWidget>
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  FFLocalizations.of(context).getText(
-                                    'f4cehtmd' /* Email */,
-                                  ),
-                                  style: FlutterFlowTheme.of(context)
-                                      .bodyMedium
+                                  FFLocalizations.of(context)
+                                      .getText('f4cehtmd' /* Email */),
+                                  style: FlutterFlowTheme.of(context).bodyMedium
                                       .override(
                                         font: GoogleFonts.plusJakartaSans(
                                           fontWeight: FontWeight.w500,
-                                          fontStyle:
-                                              FlutterFlowTheme.of(context)
-                                                  .bodyMedium
-                                                  .fontStyle,
+                                          fontStyle: FlutterFlowTheme.of(
+                                            context,
+                                          ).bodyMedium.fontStyle,
                                         ),
                                         color: FlutterFlowTheme.of(context)
                                             .secondaryText,
@@ -489,55 +542,47 @@ class _SignUpWidgetState extends State<SignUpWidget>
                                           .labelMedium
                                           .override(
                                             font: GoogleFonts.plusJakartaSans(
-                                              fontWeight:
-                                                  FlutterFlowTheme.of(context)
-                                                      .labelMedium
-                                                      .fontWeight,
-                                              fontStyle:
-                                                  FlutterFlowTheme.of(context)
-                                                      .labelMedium
-                                                      .fontStyle,
+                                              fontWeight: FlutterFlowTheme.of(
+                                                context,
+                                              ).labelMedium.fontWeight,
+                                              fontStyle: FlutterFlowTheme.of(
+                                                context,
+                                              ).labelMedium.fontStyle,
                                             ),
                                             color: FlutterFlowTheme.of(context)
                                                 .secondaryText,
                                             fontSize: 13.0,
                                             letterSpacing: 0.0,
-                                            fontWeight:
-                                                FlutterFlowTheme.of(context)
-                                                    .labelMedium
-                                                    .fontWeight,
-                                            fontStyle:
-                                                FlutterFlowTheme.of(context)
-                                                    .labelMedium
-                                                    .fontStyle,
+                                            fontWeight: FlutterFlowTheme.of(
+                                              context,
+                                            ).labelMedium.fontWeight,
+                                            fontStyle: FlutterFlowTheme.of(
+                                              context,
+                                            ).labelMedium.fontStyle,
                                           ),
-                                      hintText:
-                                          FFLocalizations.of(context).getText(
-                                        '941zjgz3' /* Enter your email... */,
-                                      ),
+                                      hintText: FFLocalizations.of(context)
+                                          .getText(
+                                            '941zjgz3' /* Enter your email... */,
+                                          ),
                                       hintStyle: FlutterFlowTheme.of(context)
                                           .labelMedium
                                           .override(
                                             font: GoogleFonts.plusJakartaSans(
-                                              fontWeight:
-                                                  FlutterFlowTheme.of(context)
-                                                      .labelMedium
-                                                      .fontWeight,
-                                              fontStyle:
-                                                  FlutterFlowTheme.of(context)
-                                                      .labelMedium
-                                                      .fontStyle,
+                                              fontWeight: FlutterFlowTheme.of(
+                                                context,
+                                              ).labelMedium.fontWeight,
+                                              fontStyle: FlutterFlowTheme.of(
+                                                context,
+                                              ).labelMedium.fontStyle,
                                             ),
                                             fontSize: 13.0,
                                             letterSpacing: 0.0,
-                                            fontWeight:
-                                                FlutterFlowTheme.of(context)
-                                                    .labelMedium
-                                                    .fontWeight,
-                                            fontStyle:
-                                                FlutterFlowTheme.of(context)
-                                                    .labelMedium
-                                                    .fontStyle,
+                                            fontWeight: FlutterFlowTheme.of(
+                                              context,
+                                            ).labelMedium.fontWeight,
+                                            fontStyle: FlutterFlowTheme.of(
+                                              context,
+                                            ).labelMedium.fontStyle,
                                           ),
                                       enabledBorder: OutlineInputBorder(
                                         borderSide: BorderSide(
@@ -545,8 +590,9 @@ class _SignUpWidgetState extends State<SignUpWidget>
                                               .alternate,
                                           width: 1.0,
                                         ),
-                                        borderRadius:
-                                            BorderRadius.circular(16.0),
+                                        borderRadius: BorderRadius.circular(
+                                          16.0,
+                                        ),
                                       ),
                                       focusedBorder: OutlineInputBorder(
                                         borderSide: BorderSide(
@@ -554,8 +600,9 @@ class _SignUpWidgetState extends State<SignUpWidget>
                                               .primary,
                                           width: 1.0,
                                         ),
-                                        borderRadius:
-                                            BorderRadius.circular(16.0),
+                                        borderRadius: BorderRadius.circular(
+                                          16.0,
+                                        ),
                                       ),
                                       errorBorder: OutlineInputBorder(
                                         borderSide: BorderSide(
@@ -563,8 +610,9 @@ class _SignUpWidgetState extends State<SignUpWidget>
                                               .error,
                                           width: 1.0,
                                         ),
-                                        borderRadius:
-                                            BorderRadius.circular(16.0),
+                                        borderRadius: BorderRadius.circular(
+                                          16.0,
+                                        ),
                                       ),
                                       focusedErrorBorder: OutlineInputBorder(
                                         borderSide: BorderSide(
@@ -572,15 +620,20 @@ class _SignUpWidgetState extends State<SignUpWidget>
                                               .error,
                                           width: 1.0,
                                         ),
-                                        borderRadius:
-                                            BorderRadius.circular(16.0),
+                                        borderRadius: BorderRadius.circular(
+                                          16.0,
+                                        ),
                                       ),
                                       filled: true,
-                                      fillColor:
-                                          FlutterFlowTheme.of(context).senary,
+                                      fillColor: FlutterFlowTheme.of(context)
+                                          .senary,
                                       contentPadding:
                                           EdgeInsetsDirectional.fromSTEB(
-                                              14.0, 22.0, 14.0, 22.0),
+                                            14.0,
+                                            22.0,
+                                            14.0,
+                                            22.0,
+                                          ),
                                       hoverColor: Colors.transparent,
                                     ),
                                     style: FlutterFlowTheme.of(context)
@@ -588,18 +641,16 @@ class _SignUpWidgetState extends State<SignUpWidget>
                                         .override(
                                           font: GoogleFonts.plusJakartaSans(
                                             fontWeight: FontWeight.w500,
-                                            fontStyle:
-                                                FlutterFlowTheme.of(context)
-                                                    .bodyMedium
-                                                    .fontStyle,
+                                            fontStyle: FlutterFlowTheme.of(
+                                              context,
+                                            ).bodyMedium.fontStyle,
                                           ),
                                           fontSize: 13.0,
                                           letterSpacing: 0.0,
                                           fontWeight: FontWeight.w500,
-                                          fontStyle:
-                                              FlutterFlowTheme.of(context)
-                                                  .bodyMedium
-                                                  .fontStyle,
+                                          fontStyle: FlutterFlowTheme.of(
+                                            context,
+                                          ).bodyMedium.fontStyle,
                                         ),
                                     cursorColor: FlutterFlowTheme.of(context)
                                         .primaryText,
@@ -614,18 +665,15 @@ class _SignUpWidgetState extends State<SignUpWidget>
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  FFLocalizations.of(context).getText(
-                                    'xvu64i0n' /* Password */,
-                                  ),
-                                  style: FlutterFlowTheme.of(context)
-                                      .bodyMedium
+                                  FFLocalizations.of(context)
+                                      .getText('xvu64i0n' /* Password */),
+                                  style: FlutterFlowTheme.of(context).bodyMedium
                                       .override(
                                         font: GoogleFonts.plusJakartaSans(
                                           fontWeight: FontWeight.w500,
-                                          fontStyle:
-                                              FlutterFlowTheme.of(context)
-                                                  .bodyMedium
-                                                  .fontStyle,
+                                          fontStyle: FlutterFlowTheme.of(
+                                            context,
+                                          ).bodyMedium.fontStyle,
                                         ),
                                         color: FlutterFlowTheme.of(context)
                                             .secondaryText,
@@ -650,51 +698,43 @@ class _SignUpWidgetState extends State<SignUpWidget>
                                           .labelMedium
                                           .override(
                                             font: GoogleFonts.plusJakartaSans(
-                                              fontWeight:
-                                                  FlutterFlowTheme.of(context)
-                                                      .labelMedium
-                                                      .fontWeight,
-                                              fontStyle:
-                                                  FlutterFlowTheme.of(context)
-                                                      .labelMedium
-                                                      .fontStyle,
+                                              fontWeight: FlutterFlowTheme.of(
+                                                context,
+                                              ).labelMedium.fontWeight,
+                                              fontStyle: FlutterFlowTheme.of(
+                                                context,
+                                              ).labelMedium.fontStyle,
                                             ),
                                             color: FlutterFlowTheme.of(context)
                                                 .secondaryText,
                                             fontSize: 13.0,
                                             letterSpacing: 0.0,
-                                            fontWeight:
-                                                FlutterFlowTheme.of(context)
-                                                    .labelMedium
-                                                    .fontWeight,
-                                            fontStyle:
-                                                FlutterFlowTheme.of(context)
-                                                    .labelMedium
-                                                    .fontStyle,
+                                            fontWeight: FlutterFlowTheme.of(
+                                              context,
+                                            ).labelMedium.fontWeight,
+                                            fontStyle: FlutterFlowTheme.of(
+                                              context,
+                                            ).labelMedium.fontStyle,
                                           ),
                                       hintStyle: FlutterFlowTheme.of(context)
                                           .labelMedium
                                           .override(
                                             font: GoogleFonts.plusJakartaSans(
-                                              fontWeight:
-                                                  FlutterFlowTheme.of(context)
-                                                      .labelMedium
-                                                      .fontWeight,
-                                              fontStyle:
-                                                  FlutterFlowTheme.of(context)
-                                                      .labelMedium
-                                                      .fontStyle,
+                                              fontWeight: FlutterFlowTheme.of(
+                                                context,
+                                              ).labelMedium.fontWeight,
+                                              fontStyle: FlutterFlowTheme.of(
+                                                context,
+                                              ).labelMedium.fontStyle,
                                             ),
                                             fontSize: 13.0,
                                             letterSpacing: 0.0,
-                                            fontWeight:
-                                                FlutterFlowTheme.of(context)
-                                                    .labelMedium
-                                                    .fontWeight,
-                                            fontStyle:
-                                                FlutterFlowTheme.of(context)
-                                                    .labelMedium
-                                                    .fontStyle,
+                                            fontWeight: FlutterFlowTheme.of(
+                                              context,
+                                            ).labelMedium.fontWeight,
+                                            fontStyle: FlutterFlowTheme.of(
+                                              context,
+                                            ).labelMedium.fontStyle,
                                           ),
                                       enabledBorder: OutlineInputBorder(
                                         borderSide: BorderSide(
@@ -702,8 +742,9 @@ class _SignUpWidgetState extends State<SignUpWidget>
                                               .alternate,
                                           width: 1.0,
                                         ),
-                                        borderRadius:
-                                            BorderRadius.circular(16.0),
+                                        borderRadius: BorderRadius.circular(
+                                          16.0,
+                                        ),
                                       ),
                                       focusedBorder: OutlineInputBorder(
                                         borderSide: BorderSide(
@@ -711,8 +752,9 @@ class _SignUpWidgetState extends State<SignUpWidget>
                                               .primary,
                                           width: 1.0,
                                         ),
-                                        borderRadius:
-                                            BorderRadius.circular(16.0),
+                                        borderRadius: BorderRadius.circular(
+                                          16.0,
+                                        ),
                                       ),
                                       errorBorder: OutlineInputBorder(
                                         borderSide: BorderSide(
@@ -720,8 +762,9 @@ class _SignUpWidgetState extends State<SignUpWidget>
                                               .error,
                                           width: 1.0,
                                         ),
-                                        borderRadius:
-                                            BorderRadius.circular(16.0),
+                                        borderRadius: BorderRadius.circular(
+                                          16.0,
+                                        ),
                                       ),
                                       focusedErrorBorder: OutlineInputBorder(
                                         borderSide: BorderSide(
@@ -729,24 +772,31 @@ class _SignUpWidgetState extends State<SignUpWidget>
                                               .error,
                                           width: 1.0,
                                         ),
-                                        borderRadius:
-                                            BorderRadius.circular(16.0),
+                                        borderRadius: BorderRadius.circular(
+                                          16.0,
+                                        ),
                                       ),
                                       filled: true,
-                                      fillColor:
-                                          FlutterFlowTheme.of(context).senary,
+                                      fillColor: FlutterFlowTheme.of(context)
+                                          .senary,
                                       contentPadding:
                                           EdgeInsetsDirectional.fromSTEB(
-                                              14.0, 22.0, 14.0, 22.0),
+                                            14.0,
+                                            22.0,
+                                            14.0,
+                                            22.0,
+                                          ),
                                       hoverColor: Colors.transparent,
                                       suffixIcon: InkWell(
                                         onTap: () async {
-                                          safeSetState(() =>
-                                              _model.passwordVisibility =
-                                                  !_model.passwordVisibility);
+                                          safeSetState(
+                                            () => _model.passwordVisibility =
+                                                !_model.passwordVisibility,
+                                          );
                                         },
-                                        focusNode:
-                                            FocusNode(skipTraversal: true),
+                                        focusNode: FocusNode(
+                                          skipTraversal: true,
+                                        ),
                                         child: Icon(
                                           _model.passwordVisibility
                                               ? Icons.visibility_outlined
@@ -762,18 +812,16 @@ class _SignUpWidgetState extends State<SignUpWidget>
                                         .override(
                                           font: GoogleFonts.plusJakartaSans(
                                             fontWeight: FontWeight.w500,
-                                            fontStyle:
-                                                FlutterFlowTheme.of(context)
-                                                    .bodyMedium
-                                                    .fontStyle,
+                                            fontStyle: FlutterFlowTheme.of(
+                                              context,
+                                            ).bodyMedium.fontStyle,
                                           ),
                                           fontSize: 13.0,
                                           letterSpacing: 0.0,
                                           fontWeight: FontWeight.w500,
-                                          fontStyle:
-                                              FlutterFlowTheme.of(context)
-                                                  .bodyMedium
-                                                  .fontStyle,
+                                          fontStyle: FlutterFlowTheme.of(
+                                            context,
+                                          ).bodyMedium.fontStyle,
                                         ),
                                     cursorColor: FlutterFlowTheme.of(context)
                                         .primaryText,
@@ -796,8 +844,9 @@ class _SignUpWidgetState extends State<SignUpWidget>
                                         materialTapTargetSize:
                                             MaterialTapTargetSize.shrinkWrap,
                                         shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(4.0),
+                                          borderRadius: BorderRadius.circular(
+                                            4.0,
+                                          ),
                                         ),
                                       ),
                                       unselectedWidgetColor:
@@ -805,25 +854,28 @@ class _SignUpWidgetState extends State<SignUpWidget>
                                               .alternate,
                                     ),
                                     child: Checkbox(
-                                      value: _model.checkboxValue ??= true,
+                                      value: _model.checkboxValue ??= false,
                                       onChanged: (newValue) async {
-                                        safeSetState(() =>
-                                            _model.checkboxValue = newValue!);
+                                        safeSetState(
+                                          () =>
+                                              _model.checkboxValue = newValue!,
+                                        );
                                       },
-                                      side: (FlutterFlowTheme.of(context)
+                                      side:
+                                          (FlutterFlowTheme.of(context)
                                                   .alternate !=
                                               null)
                                           ? BorderSide(
                                               width: 2,
-                                              color:
-                                                  FlutterFlowTheme.of(context)
-                                                      .alternate!,
+                                              color: FlutterFlowTheme.of(
+                                                context,
+                                              ).alternate!,
                                             )
                                           : null,
-                                      activeColor:
-                                          FlutterFlowTheme.of(context).primary,
-                                      checkColor:
-                                          FlutterFlowTheme.of(context).info,
+                                      activeColor: FlutterFlowTheme.of(context)
+                                          .primary,
+                                      checkColor: FlutterFlowTheme.of(context)
+                                          .info,
                                     ),
                                   ),
                                 ),
@@ -832,34 +884,32 @@ class _SignUpWidgetState extends State<SignUpWidget>
                                   text: TextSpan(
                                     children: [
                                       TextSpan(
-                                        text:
-                                            FFLocalizations.of(context).getText(
-                                          '9nnzr4vs' /* I give my consent to the proce... */,
-                                        ),
+                                        text: FFLocalizations.of(context)
+                                            .getText(
+                                              '9nnzr4vs' /* I give my consent to the proce... */,
+                                            ),
                                         style: FlutterFlowTheme.of(context)
                                             .bodyMedium
                                             .override(
                                               font: GoogleFonts.plusJakartaSans(
                                                 fontWeight: FontWeight.normal,
-                                                fontStyle:
-                                                    FlutterFlowTheme.of(context)
-                                                        .bodyMedium
-                                                        .fontStyle,
+                                                fontStyle: FlutterFlowTheme.of(
+                                                  context,
+                                                ).bodyMedium.fontStyle,
                                               ),
                                               fontSize: 12.0,
                                               letterSpacing: 0.0,
                                               fontWeight: FontWeight.normal,
-                                              fontStyle:
-                                                  FlutterFlowTheme.of(context)
-                                                      .bodyMedium
-                                                      .fontStyle,
+                                              fontStyle: FlutterFlowTheme.of(
+                                                context,
+                                              ).bodyMedium.fontStyle,
                                             ),
                                       ),
                                       TextSpan(
-                                        text:
-                                            FFLocalizations.of(context).getText(
-                                          '9p0ryanr' /* Personal Data and */,
-                                        ),
+                                        text: FFLocalizations.of(context)
+                                            .getText(
+                                              '9p0ryanr' /* Personal Data and */,
+                                            ),
                                         style: TextStyle(
                                           color: FlutterFlowTheme.of(context)
                                               .secondary,
@@ -867,41 +917,39 @@ class _SignUpWidgetState extends State<SignUpWidget>
                                         ),
                                       ),
                                       TextSpan(
-                                        text:
-                                            FFLocalizations.of(context).getText(
-                                          'v2dssg0v' /*  and accept  */,
-                                        ),
+                                        text: FFLocalizations.of(context)
+                                            .getText(
+                                              'v2dssg0v' /*  and accept  */,
+                                            ),
                                         style: TextStyle(),
                                       ),
                                       TextSpan(
-                                        text:
-                                            FFLocalizations.of(context).getText(
-                                          'ent7j114' /* Privacy Policy */,
-                                        ),
+                                        text: FFLocalizations.of(context)
+                                            .getText(
+                                              'ent7j114' /* Privacy Policy */,
+                                            ),
                                         style: TextStyle(
                                           color: FlutterFlowTheme.of(context)
                                               .secondary,
                                           fontWeight: FontWeight.w500,
                                         ),
-                                      )
+                                      ),
                                     ],
                                     style: FlutterFlowTheme.of(context)
                                         .bodyMedium
                                         .override(
                                           font: GoogleFonts.plusJakartaSans(
                                             fontWeight: FontWeight.normal,
-                                            fontStyle:
-                                                FlutterFlowTheme.of(context)
-                                                    .bodyMedium
-                                                    .fontStyle,
+                                            fontStyle: FlutterFlowTheme.of(
+                                              context,
+                                            ).bodyMedium.fontStyle,
                                           ),
                                           fontSize: 12.0,
                                           letterSpacing: 0.0,
                                           fontWeight: FontWeight.normal,
-                                          fontStyle:
-                                              FlutterFlowTheme.of(context)
-                                                  .bodyMedium
-                                                  .fontStyle,
+                                          fontStyle: FlutterFlowTheme.of(
+                                            context,
+                                          ).bodyMedium.fontStyle,
                                           lineHeight: 1.6,
                                         ),
                                   ),
@@ -913,39 +961,20 @@ class _SignUpWidgetState extends State<SignUpWidget>
                                 model: _model.customButtonModel,
                                 updateCallback: () => safeSetState(() {}),
                                 child: CustomButtonWidget(
-                                  title: 'Sign Up',
-                                  action: () async {
-                                    showDialog(
-                                      barrierColor: Color(0x65000000),
-                                      context: context,
-                                      builder: (dialogContext) {
-                                        return Dialog(
-                                          elevation: 0,
-                                          insetPadding: EdgeInsets.zero,
-                                          backgroundColor: Colors.transparent,
-                                          alignment: AlignmentDirectional(
-                                                  0.0, 0.0)
-                                              .resolve(
-                                                  Directionality.of(context)),
-                                          child: GestureDetector(
-                                            onTap: () {
-                                              FocusScope.of(dialogContext)
-                                                  .unfocus();
-                                              FocusManager.instance.primaryFocus
-                                                  ?.unfocus();
-                                            },
-                                            child: LoginProgressModalWidget(),
-                                          ),
-                                        );
-                                      },
-                                    );
-                                  },
+                                  title: _isSubmitting
+                                      ? 'Creating account…'
+                                      : 'Sign Up',
+                                  action: _createAccount,
                                 ),
                               ),
                             ),
                             Padding(
                               padding: EdgeInsetsDirectional.fromSTEB(
-                                  0.0, 24.0, 0.0, 0.0),
+                                0.0,
+                                24.0,
+                                0.0,
+                                0.0,
+                              ),
                               child: Column(
                                 mainAxisSize: MainAxisSize.max,
                                 children: [
@@ -954,28 +983,6 @@ class _SignUpWidgetState extends State<SignUpWidget>
                                     focusColor: Colors.transparent,
                                     hoverColor: Colors.transparent,
                                     highlightColor: Colors.transparent,
-                                    onTap: () async {
-                                      await showModalBottomSheet(
-                                        isScrollControlled: true,
-                                        backgroundColor: Colors.transparent,
-                                        enableDrag: false,
-                                        context: context,
-                                        builder: (context) {
-                                          return GestureDetector(
-                                            onTap: () {
-                                              FocusScope.of(context).unfocus();
-                                              FocusManager.instance.primaryFocus
-                                                  ?.unfocus();
-                                            },
-                                            child: Padding(
-                                              padding: MediaQuery.viewInsetsOf(
-                                                  context),
-                                              child: LoginProgressModalWidget(),
-                                            ),
-                                          );
-                                        },
-                                      ).then((value) => safeSetState(() {}));
-                                    },
                                     child: Row(
                                       mainAxisSize: MainAxisSize.max,
                                       children: [
@@ -984,9 +991,9 @@ class _SignUpWidgetState extends State<SignUpWidget>
                                             width: 100.0,
                                             height: 1.0,
                                             decoration: BoxDecoration(
-                                              color:
-                                                  FlutterFlowTheme.of(context)
-                                                      .alternate,
+                                              color: FlutterFlowTheme.of(
+                                                context,
+                                              ).alternate,
                                             ),
                                           ),
                                         ),
@@ -999,23 +1006,24 @@ class _SignUpWidgetState extends State<SignUpWidget>
                                               .override(
                                                 font:
                                                     GoogleFonts.plusJakartaSans(
-                                                  fontWeight: FontWeight.w500,
-                                                  fontStyle:
-                                                      FlutterFlowTheme.of(
-                                                              context)
-                                                          .bodyMedium
-                                                          .fontStyle,
-                                                ),
-                                                color:
-                                                    FlutterFlowTheme.of(context)
-                                                        .secondaryText,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                      fontStyle:
+                                                          FlutterFlowTheme.of(
+                                                                context,
+                                                              )
+                                                              .bodyMedium
+                                                              .fontStyle,
+                                                    ),
+                                                color: FlutterFlowTheme.of(
+                                                  context,
+                                                ).secondaryText,
                                                 fontSize: 13.0,
                                                 letterSpacing: 0.0,
                                                 fontWeight: FontWeight.w500,
-                                                fontStyle:
-                                                    FlutterFlowTheme.of(context)
-                                                        .bodyMedium
-                                                        .fontStyle,
+                                                fontStyle: FlutterFlowTheme.of(
+                                                  context,
+                                                ).bodyMedium.fontStyle,
                                               ),
                                         ),
                                         Expanded(
@@ -1023,9 +1031,9 @@ class _SignUpWidgetState extends State<SignUpWidget>
                                             width: 100.0,
                                             height: 1.0,
                                             decoration: BoxDecoration(
-                                              color:
-                                                  FlutterFlowTheme.of(context)
-                                                      .alternate,
+                                              color: FlutterFlowTheme.of(
+                                                context,
+                                              ).alternate,
                                             ),
                                           ),
                                         ),
@@ -1041,8 +1049,8 @@ class _SignUpWidgetState extends State<SignUpWidget>
                                           updateCallback: () =>
                                               safeSetState(() {}),
                                           child: SocialLoginBtnWidget(
-                                            logo:
-                                                'https://storage.googleapis.com/flutterflow-io-6f20.appspot.com/projects/assets-3ajpcu/assets/pqetxa87ekja/Facebook.svg',
+                                            providerId: 'facebook.com',
+                                            logo: 'https://storage.googleapis.com/flutterflow-io-6f20.appspot.com/projects/assets-3ajpcu/assets/pqetxa87ekja/Facebook.svg',
                                           ),
                                         ),
                                       ),
@@ -1052,8 +1060,8 @@ class _SignUpWidgetState extends State<SignUpWidget>
                                           updateCallback: () =>
                                               safeSetState(() {}),
                                           child: SocialLoginBtnWidget(
-                                            logo:
-                                                'https://storage.googleapis.com/flutterflow-io-6f20.appspot.com/projects/assets-3ajpcu/assets/rtanb0p1vu0v/google-logo-search-new.svg',
+                                            providerId: 'google.com',
+                                            logo: 'https://storage.googleapis.com/flutterflow-io-6f20.appspot.com/projects/assets-3ajpcu/assets/rtanb0p1vu0v/google-logo-search-new.svg',
                                           ),
                                         ),
                                       ),
@@ -1063,8 +1071,8 @@ class _SignUpWidgetState extends State<SignUpWidget>
                                           updateCallback: () =>
                                               safeSetState(() {}),
                                           child: SocialLoginBtnWidget(
-                                            logo:
-                                                'https://storage.googleapis.com/flutterflow-io-6f20.appspot.com/projects/assets-3ajpcu/assets/xwe05ke2lsv9/Apple_Logo_White.svg',
+                                            providerId: 'apple.com',
+                                            logo: 'https://storage.googleapis.com/flutterflow-io-6f20.appspot.com/projects/assets-3ajpcu/assets/xwe05ke2lsv9/Apple_Logo_White.svg',
                                           ),
                                         ),
                                       ),
@@ -1083,95 +1091,92 @@ class _SignUpWidgetState extends State<SignUpWidget>
                                             hasTransition: true,
                                             transitionType:
                                                 PageTransitionType.fade,
-                                            duration:
-                                                Duration(milliseconds: 400),
+                                            duration: Duration(
+                                              milliseconds: 400,
+                                            ),
                                           ),
                                         },
                                       );
                                     },
                                     child: RichText(
-                                      textScaler:
-                                          MediaQuery.of(context).textScaler,
+                                      textScaler: MediaQuery.of(context)
+                                          .textScaler,
                                       text: TextSpan(
                                         children: [
                                           TextSpan(
                                             text: FFLocalizations.of(context)
                                                 .getText(
-                                              '4hj7pe01' /* Don’t have an account? */,
-                                            ),
+                                                  '4hj7pe01' /* Don’t have an account? */,
+                                                ),
                                             style: FlutterFlowTheme.of(context)
                                                 .bodyMedium
                                                 .override(
-                                                  font: GoogleFonts
-                                                      .plusJakartaSans(
-                                                    fontWeight:
-                                                        FlutterFlowTheme.of(
-                                                                context)
-                                                            .bodyMedium
-                                                            .fontWeight,
-                                                    fontStyle:
-                                                        FlutterFlowTheme.of(
-                                                                context)
-                                                            .bodyMedium
-                                                            .fontStyle,
-                                                  ),
+                                                  font:
+                                                      GoogleFonts.plusJakartaSans(
+                                                        fontWeight:
+                                                            FlutterFlowTheme.of(
+                                                                  context,
+                                                                )
+                                                                .bodyMedium
+                                                                .fontWeight,
+                                                        fontStyle:
+                                                            FlutterFlowTheme.of(
+                                                                  context,
+                                                                )
+                                                                .bodyMedium
+                                                                .fontStyle,
+                                                      ),
                                                   color: FlutterFlowTheme.of(
-                                                          context)
-                                                      .secondaryText,
+                                                    context,
+                                                  ).secondaryText,
                                                   fontSize: 14.0,
                                                   letterSpacing: 0.0,
                                                   fontWeight:
                                                       FlutterFlowTheme.of(
-                                                              context)
-                                                          .bodyMedium
-                                                          .fontWeight,
+                                                        context,
+                                                      ).bodyMedium.fontWeight,
                                                   fontStyle:
                                                       FlutterFlowTheme.of(
-                                                              context)
-                                                          .bodyMedium
-                                                          .fontStyle,
+                                                        context,
+                                                      ).bodyMedium.fontStyle,
                                                 ),
                                           ),
                                           TextSpan(
                                             text: FFLocalizations.of(context)
                                                 .getText(
-                                              'xy40hpq0' /*  Sign In */,
-                                            ),
+                                                  'xy40hpq0' /*  Sign In */,
+                                                ),
                                             style: GoogleFonts.poppins(
-                                              color:
-                                                  FlutterFlowTheme.of(context)
-                                                      .secondary,
+                                              color: FlutterFlowTheme.of(
+                                                context,
+                                              ).secondary,
                                               fontWeight: FontWeight.w500,
                                               fontSize: 14.0,
                                             ),
-                                          )
+                                          ),
                                         ],
                                         style: FlutterFlowTheme.of(context)
                                             .bodyMedium
                                             .override(
                                               font: GoogleFonts.plusJakartaSans(
-                                                fontWeight:
-                                                    FlutterFlowTheme.of(context)
-                                                        .bodyMedium
-                                                        .fontWeight,
-                                                fontStyle:
-                                                    FlutterFlowTheme.of(context)
-                                                        .bodyMedium
-                                                        .fontStyle,
+                                                fontWeight: FlutterFlowTheme.of(
+                                                  context,
+                                                ).bodyMedium.fontWeight,
+                                                fontStyle: FlutterFlowTheme.of(
+                                                  context,
+                                                ).bodyMedium.fontStyle,
                                               ),
-                                              color:
-                                                  FlutterFlowTheme.of(context)
-                                                      .secondaryText,
+                                              color: FlutterFlowTheme.of(
+                                                context,
+                                              ).secondaryText,
                                               fontSize: 14.0,
                                               letterSpacing: 0.0,
-                                              fontWeight:
-                                                  FlutterFlowTheme.of(context)
-                                                      .bodyMedium
-                                                      .fontWeight,
-                                              fontStyle:
-                                                  FlutterFlowTheme.of(context)
-                                                      .bodyMedium
-                                                      .fontStyle,
+                                              fontWeight: FlutterFlowTheme.of(
+                                                context,
+                                              ).bodyMedium.fontWeight,
+                                              fontStyle: FlutterFlowTheme.of(
+                                                context,
+                                              ).bodyMedium.fontStyle,
                                             ),
                                       ),
                                     ),
@@ -1185,7 +1190,8 @@ class _SignUpWidgetState extends State<SignUpWidget>
                     ),
                   ),
                 ).animateOnPageLoad(
-                    animationsMap['containerOnPageLoadAnimation']!),
+                  animationsMap['containerOnPageLoadAnimation']!,
+                ),
               ].divide(SizedBox(height: 32.0)),
             ),
           ],
