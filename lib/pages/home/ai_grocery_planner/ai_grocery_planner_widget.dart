@@ -6,6 +6,7 @@ import '/flutter_flow/flutter_flow_icon_button.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
+import '/app_state.dart';
 import 'dart:ui';
 import '/index.dart';
 import 'package:flutter/material.dart';
@@ -848,6 +849,12 @@ class _AiGroceryPlannerWidgetState extends State<AiGroceryPlannerWidget> {
                                   child: CustomButtonWidget(
                                     title: 'Save & Continue',
                                     action: () async {
+                                      FFAppState().aiPlannerShoppingFrequency =
+                                          _model.selector1;
+                                      FFAppState().aiPlannerMealStyle =
+                                          _model.selector2;
+                                      FFAppState().aiPlannerDietaryPreference =
+                                          _model.selector3;
                                       context.pushNamed(
                                           AiGroceryPlannerProcessingWidget
                                               .routeName);

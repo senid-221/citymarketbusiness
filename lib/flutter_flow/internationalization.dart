@@ -5839,7 +5839,7 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
       'tr': '',
     },
     'hvbcodo5': {
-      'en': 'Vegetables',
+      'en': 'Your shopping list',
       'ar': '',
       'bn': '',
       'es': '',
@@ -5851,7 +5851,7 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
       'tr': '',
     },
     'lrab6vy8': {
-      'en': 'Dairy',
+      'en': 'More from your plan',
       'ar': '',
       'bn': '',
       'es': '',

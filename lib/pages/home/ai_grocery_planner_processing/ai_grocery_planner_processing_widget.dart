@@ -1,4 +1,6 @@
 import '/components/bg_card/bg_card_widget.dart';
+import '/backend/ai_grocery_planner_service.dart';
+import '/app_state.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
@@ -36,13 +38,32 @@ class _AiGroceryPlannerProcessingWidgetState
 
     // On page load action.
     SchedulerBinding.instance.addPostFrameCallback((_) async {
-      await Future.delayed(
-        Duration(
-          milliseconds: 3000,
-        ),
-      );
-
-      context.pushNamed(AIGroceryPlannerSuggectionWidget.routeName);
+      try {
+        await AiGroceryPlannerService.generateAndSave(
+          shoppingFrequency: FFAppState().aiPlannerShoppingFrequency,
+          mealStyle: FFAppState().aiPlannerMealStyle,
+          dietaryPreference: FFAppState().aiPlannerDietaryPreference,
+        );
+        if (!mounted) return;
+        context.pushNamed(AIGroceryPlannerSuggectionWidget.routeName);
+      } catch (error) {
+        if (!mounted) return;
+        final message = error.toString().replaceFirst('Bad state: ', '');
+        await showDialog<void>(
+          context: context,
+          builder: (dialogContext) => AlertDialog(
+            title: const Text('Could not create your plan'),
+            content: Text(message),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(dialogContext).pop(),
+                child: const Text('OK'),
+              ),
+            ],
+          ),
+        );
+        if (mounted) context.safePop();
+      }
     });
   }
 
